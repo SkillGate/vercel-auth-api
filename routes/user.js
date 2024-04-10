@@ -1,7 +1,5 @@
 const User = require("../models/User");
-const {
-  verifyToken
-} = require("./verifyToken");
+const { verifyToken } = require("./verifyToken");
 
 const router = require("express").Router();
 const CryptoJS = require("crypto-js");
@@ -28,7 +26,85 @@ router.put("/:id", verifyToken, async (req, res) => {
       { new: true }
     );
 
-    if (!updatedUser || (Array.isArray(updatedUser) && updatedUser.length === 0)) {
+    if (
+      !updatedUser ||
+      (Array.isArray(updatedUser) && updatedUser.length === 0)
+    ) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.put("/newly/:id", verifyToken, async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({ error: "ID is required" });
+  }
+
+  const experience = req.query["experience"];
+  const education = req.query["education"];
+  const projects = req.query["projects"];
+  const awards = req.query["awards"];
+  const volunteering = req.query["volunteering"];
+
+  if (req.body.password) {
+    req.body.password = CryptoJS.AES.encrypt(
+      req.body.password,
+      process.env.PASS_SEC
+    ).toString();
+  }
+
+  try {
+    let updatedUser;
+    if (experience) {
+      updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $push: { experience: req.body },
+        },
+        { new: true }
+      );
+    } else if (education) {
+      updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $push: { education: req.body },
+        },
+        { new: true }
+      );
+    } else if (projects) {
+      updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $push: { projects: req.body },
+        },
+        { new: true }
+      );
+    } else if (awards) {
+      updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $push: { awards: req.body },
+        },
+        { new: true }
+      );
+    } else if (volunteering) {
+      updatedUser = await User.findByIdAndUpdate(
+        req.params.id,
+        {
+          $push: { volunteering: req.body },
+        },
+        { new: true }
+      );
+    }
+
+    if (
+      !updatedUser ||
+      (Array.isArray(updatedUser) && updatedUser.length === 0)
+    ) {
       return res.status(404).json({ error: "User not found" });
     }
 
@@ -57,7 +133,7 @@ router.get("/find/:id", verifyToken, async (req, res) => {
   if (!req.params.id) {
     return res.status(400).json({ error: "ID is required" });
   }
-  
+
   try {
     const user = await User.findById(req.params.id);
     const { password, ...others } = user._doc;
