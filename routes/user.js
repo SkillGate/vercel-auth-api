@@ -114,6 +114,100 @@ router.put("/newly/:id", verifyToken, async (req, res) => {
   }
 });
 
+//UPDATE SPECIFC STATUS
+router.put("/update/:id", verifyToken, async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({ error: "ID is required" });
+  }
+
+  const { type } = req.query;
+
+  if (!type) {
+    return res
+      .status(400)
+      .json({ error: "Type of data to update is required" });
+  }
+
+  const allowedTypes = [
+    "experience",
+    "education",
+    "projects",
+    "awards",
+    "volunteering",
+  ];
+  if (!allowedTypes.includes(type)) {
+    return res.status(400).json({ error: "Invalid type of data to update" });
+  }
+
+  try {
+    let updatedUser;
+    updatedUser = await User.findOneAndUpdate(
+      { _id: req.params.id, [`${type}._id`]: req.body._id },
+      {
+        $set: { [`${type}.$`]: req.body },
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+//DELETE SPECIFC STATUS
+router.delete("/remove/:id", verifyToken, async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({ error: "ID is required" });
+  }
+
+  const { type, itemId } = req.query;
+
+  if (!type) {
+    return res
+      .status(400)
+      .json({ error: "Type of data to remove is required" });
+  }
+
+  const allowedTypes = [
+    "experience",
+    "education",
+    "projects",
+    "awards",
+    "volunteering",
+  ];
+  if (!allowedTypes.includes(type)) {
+    return res.status(400).json({ error: "Invalid type of data to remove" });
+  }
+
+  if (!itemId) {
+    return res.status(400).json({ error: "Item ID to remove is required" });
+  }
+
+  try {
+    let updatedUser;
+    updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        $pull: { [type]: { _id: itemId } },
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 //DELETE
 router.delete("/:id", verifyToken, async (req, res) => {
   if (!req.params.id) {
