@@ -60,6 +60,10 @@ const UserSchema = new mongoose.Schema(
         startMonth: { type: String },
         endYear: { type: String },
         endMonth: { type: String },
+        currentlyWorking: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
     projects: [
@@ -74,6 +78,10 @@ const UserSchema = new mongoose.Schema(
         skills: { type: [String] },
         contribution: { type: String },
         gitHubLink: { type: String },
+        currentlyWorking: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
     awards: [
