@@ -18,6 +18,12 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 
   try {
+    const user = await User.findById(jobId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       {
@@ -283,6 +289,57 @@ router.get("/stats", verifyToken, async (req, res) => {
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json(err);
+  }
+});
+
+// Endpoint for adding a job ID to apply_job_id_list
+router.put("/apply/:userId", verifyToken, async (req, res) => {
+  const { jobId } = req.body;
+  const userId = req.params.userId;
+
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required" });
+  }
+
+  if (!jobId) {
+    return res.status(400).json({ error: "Job ID is required" });
+  }
+
+  try {
+    // Find the user by their ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Add the job ID to apply_job_id_list array
+    user.apply_job_id_list.push(jobId);
+
+    // Save the updated user
+    const updatedUser = await user.save();
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET USER DETAILS BASE ON USER IDs
+router.post("/users/details", async (req, res) => {
+  const { candidateIds } = req.body;
+  // const userIds = candidateIds.split(",");
+
+  if (!candidateIds) {
+    return res.status(404).json({ error: "Candidate Ids not found" });
+  }
+
+  try {
+    const users = await User.find({ _id: { $in: candidateIds } });
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

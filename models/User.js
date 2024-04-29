@@ -124,6 +124,7 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    apply_job_id_list: { type: [String] },
   },
   { timestamps: true }
 );
