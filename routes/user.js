@@ -18,7 +18,7 @@ router.put("/:id", verifyToken, async (req, res) => {
   }
 
   try {
-    const user = await User.findById(jobId);
+    const user = await User.findById(req.params.id);
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
