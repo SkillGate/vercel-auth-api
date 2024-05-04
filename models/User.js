@@ -125,6 +125,10 @@ const UserSchema = new mongoose.Schema(
       default: true,
     },
     apply_job_id_list: { type: [String] },
+    soft_skills: {
+      type: [String],
+      default: ["leadership", "communication skills"],
+    },
   },
   { timestamps: true }
 );
