@@ -129,6 +129,8 @@ const UserSchema = new mongoose.Schema(
       type: [String],
       default: ["leadership", "communication skills"],
     },
+    logo_url: { type: String, default: "" },
+    banner_url: { type: String, default: "" },
   },
   { timestamps: true }
 );
