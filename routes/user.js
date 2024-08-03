@@ -343,4 +343,57 @@ router.post("/users/details", async (req, res) => {
   }
 });
 
+// Update subscription type
+router.put("/subscription/:id", verifyToken, async (req, res) => {
+  const { subscription_type } = req.body;
+
+  if (!req.params.id) {
+    return res.status(400).json({ error: "ID is required" });
+  }
+
+  if (!subscription_type) {
+    return res.status(400).json({ error: "Subscription type is required" });
+  }
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.subscription_type = subscription_type;
+    
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "Subscription type updated successfully", user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Increase number of applications
+router.put("/applications/:id", verifyToken, async (req, res) => {
+  if (!req.params.id) {
+    return res.status(400).json({ error: "ID is required" });
+  }
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    user.no_of_applications += 1;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "Number of applications increased successfully", user });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;

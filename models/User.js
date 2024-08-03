@@ -11,6 +11,7 @@ const employmentTypes = [
   "Apprenticeship",
   "Seasonal",
 ];
+const subscriptionTypes = ["Free", "Basic", "Premium"];
 
 const UserSchema = new mongoose.Schema(
   {
@@ -131,6 +132,12 @@ const UserSchema = new mongoose.Schema(
     },
     logo_url: { type: String, default: "" },
     banner_url: { type: String, default: "" },
+    subscription_type: {
+      type: String,
+      enum: subscriptionTypes,
+      default: "Free",
+    },
+    no_of_applications: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
